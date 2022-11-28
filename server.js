@@ -1,12 +1,14 @@
 const multer = require("multer");
+const bcrypt = require("bcrypt")
 require("dotenv").config();
-const File = require("./models/file");
+const File = require("./models/File");
 const mongoose = require("mongoose");
+
 const express = require("express");
 const app = express();
 const port = process.env.PORT;
 const upload = multer({ dest: "uploads" });
-
+app.use(express.urlencoded({ extended: true }))
 mongoose.connect(process.env.DATABASE_URL);
 
 app.set("view engine", "ejs");
@@ -22,10 +24,12 @@ app.post("/upload", upload.single("file"), async (req, res) => {
   if (req.body.password != null && req.body.password != "") {
     fileData.password = await bcrypt.hash(req.body.password, 10);
   }
-  const file = await File.create(fileData);
+  const file = await fileData  //  const file = await File.create(fileData) not working
   console.log(file);
-  res.send(originalName);
-});
+  res.send(file.originalName);
+
+  
+})
 app.listen(process.env.PORT, () => {
   console.log(`server  connected at port ${port}`);
 });
